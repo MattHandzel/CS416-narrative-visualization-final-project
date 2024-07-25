@@ -1,5 +1,36 @@
-<h1>Hi</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Freshman Year Data Visualization</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        /* Add styles for better visualization */
+        .day {
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
 
-This is a data visualization where all of the data came from me! I collected the data from my Galaxy Watch 5 smartwatch (for health-related metrics like sleep, steps walked, heart rate, etc.) from my phone (used for my location log and to log my weight-training sessions), from my google calendar (to get an idea of how I spend my time), and computer (to understand when and how frequently I use my computer)
+        .highlighted {
+            fill: yellow;
+        }
 
-This data visualization will show my freshman year of college month-by-month. Important information about myself will be highlighted, and critical moments in time will be highlighted. When clicking on a specific day, the day will appear larger and more personal information will appear. Information will include how much sleep I got the night before, my weight on that day, a breakdown of how I spent my day as a pie chart. Some group of days will be highlighted with a specific color to represent on-going periods of my time. They can be things such as mid-term season, when I was home from college, if there were any events at UIUC. 
+        .tooltip {
+            position: absolute;
+            text-align: center;
+            width: 200px;
+            height: auto;
+            padding: 5px;
+            background: lightsteelblue;
+            border: 1px solid;
+            border-radius: 8px;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <svg id="visualization" width="1000" height="800"></svg>
+    <div id="tooltip" class="tooltip" style="opacity: 0;"></div>
+    <script src="script.js"></script>
+</body>
+</html>
