@@ -1,24 +1,36 @@
-d3.json("./test_data.json").then(data => {
-    const svg = d3.select("#calendar");
-    const tooltip = d3.select("#tooltip");
+let currentDate = new Date("2023-09-01"); // Initial date to display
 
-    const parseDate = d3.timeParse("%Y-%m-%d");
-    const formatDate = d3.timeFormat("%B %d, %Y");
+const svg = d3.select("#calendar");
+const tooltip = d3.select("#tooltip");
 
-    data.forEach(d => {
-        d.date = parseDate(d.date);
-        d.sleep_duration = +d.sleep_duration;
-        d.num_steps = +d.num_steps;
-        d.weight = +d.weight;
+const parseDate = d3.timeParse("%Y-%m-%d");
+const formatDate = d3.timeFormat("%B %d, %Y");
+const formatMonthYear = d3.timeFormat("%B %Y");
+
+function loadData(monthYear) {
+    d3.json("./data.json").then(data => {
+        data.forEach(d => {
+            d.date = parseDate(d.date);
+            d.sleep_duration = +d.sleep_duration;
+            d.num_steps = +d.num_steps;
+            d.weight = +d.weight;
+        });
+
+        updateCalendar(data, monthYear);
+    }).catch(error => {
+        console.error("Error loading the JSON data:", error);
     });
+}
 
-    const monthName = d3.timeFormat("%B %Y")(data[0].date);
-    const monthDays = d3.timeDays(d3.timeMonth(data[0].date), d3.timeMonth.offset(data[0].date, 1));
+function updateCalendar(data, monthYear) {
+    const calendar = d3.select("#calendar");
+    calendar.selectAll("*").remove(); // Clear existing calendar
+
+    const monthName = formatMonthYear(monthYear);
+    const monthDays = d3.timeDays(d3.timeMonth(monthYear), d3.timeMonth.offset(monthYear, 1));
 
     const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     const monthStartDay = monthDays[0].getDay();
-
-    const calendar = d3.select("#calendar");
 
     calendar.append("div")
         .attr("class", "header")
@@ -73,6 +85,15 @@ d3.json("./test_data.json").then(data => {
             dayCell.style("background-color", "lightcoral");
         }
     });
-}).catch(error => {
-    console.error("Error loading the JSON data:", error);
-});
+}
+
+function changeMonth(offset) {
+    currentDate.setMonth(currentDate.getMonth() + offset);
+    loadData(currentDate);
+}
+
+document.getElementById("prevMonth").addEventListener("click", () => changeMonth(-1));
+document.getElementById("nextMonth").addEventListener("click", () => changeMonth(1));
+
+// Initial load
+loadData(currentDate);
