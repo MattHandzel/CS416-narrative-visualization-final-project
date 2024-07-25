@@ -147,7 +147,7 @@ d3.json("./data.json").then(data => {
     allData = data; // Store all data
     updateCalendar(data, currentDate);
 }).catch(error => {
-    console.error("Error loading the JSON data:", error);
+    console.log("Error loading the JSON data:", error);
 });
 
 allData = [
