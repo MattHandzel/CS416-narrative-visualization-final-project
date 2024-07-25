@@ -21,6 +21,320 @@ d3.json("./data.json").then(data => {
 }).catch(error => {
     console.error("Error loading the JSON data:", error);
 });
+allData = [
+    {
+        "date": "2023-08-01",
+        "sleep_duration": 7,
+        "num_steps": 5000,
+        "heart_rate_pie_chart": {
+            "50-59": 0.05,
+            "60-69": 0.1,
+            "70-79": 0.1,
+            "80-89": 0.1,
+            "90-99": 0.2,
+            "100-109": 0.2,
+            "110-119": 0.2,
+            "120-129": 0.05
+        },
+        "weight": 150,
+        "timeSpent": {
+            "class": 200,
+            "study": 300,
+            "leisure": 180,
+            "exercise": 65,
+            "reading": 20,
+            "socializing": 60,
+            "eating": 120
+        },
+        "events": ["home"]
+    },
+    {
+        "date": "2023-08-02",
+        "sleep_duration": 6.5,
+        "num_steps": 6000,
+        "heart_rate_pie_chart": {
+            "50-59": 0.04,
+            "60-69": 0.12,
+            "70-79": 0.13,
+            "80-89": 0.12,
+            "90-99": 0.18,
+            "100-109": 0.18,
+            "110-119": 0.2,
+            "120-129": 0.03
+        },
+        "weight": 151,
+        "timeSpent": {
+            "class": 220,
+            "study": 280,
+            "leisure": 190,
+            "exercise": 70,
+            "reading": 30,
+            "socializing": 50,
+            "eating": 110
+        },
+        "events": ["home"]
+    },
+    {
+        "date": "2023-08-03",
+        "sleep_duration": 8,
+        "num_steps": 4500,
+        "heart_rate_pie_chart": {
+            "50-59": 0.06,
+            "60-69": 0.11,
+            "70-79": 0.09,
+            "80-89": 0.1,
+            "90-99": 0.21,
+            "100-109": 0.18,
+            "110-119": 0.19,
+            "120-129": 0.06
+        },
+        "weight": 152,
+        "timeSpent": {
+            "class": 210,
+            "study": 310,
+            "leisure": 200,
+            "exercise": 60,
+            "reading": 25,
+            "socializing": 70,
+            "eating": 130
+        },
+        "events": ["mid-term season"]
+    },
+    {
+        "date": "2023-08-04",
+        "sleep_duration": 5.5,
+        "num_steps": 7000,
+        "heart_rate_pie_chart": {
+            "50-59": 0.03,
+            "60-69": 0.15,
+            "70-79": 0.1,
+            "80-89": 0.1,
+            "90-99": 0.19,
+            "100-109": 0.2,
+            "110-119": 0.18,
+            "120-129": 0.05
+        },
+        "weight": 150,
+        "timeSpent": {
+            "class": 250,
+            "study": 320,
+            "leisure": 160,
+            "exercise": 80,
+            "reading": 35,
+            "socializing": 40,
+            "eating": 100
+        },
+        "events": ["mid-term season"]
+    },
+    {
+        "date": "2023-08-05",
+        "sleep_duration": 7.5,
+        "num_steps": 5500,
+        "heart_rate_pie_chart": {
+            "50-59": 0.07,
+            "60-69": 0.1,
+            "70-79": 0.12,
+            "80-89": 0.09,
+            "90-99": 0.2,
+            "100-109": 0.19,
+            "110-119": 0.15,
+            "120-129": 0.08
+        },
+        "weight": 153,
+        "timeSpent": {
+            "class": 230,
+            "study": 290,
+            "leisure": 210,
+            "exercise": 75,
+            "reading": 30,
+            "socializing": 55,
+            "eating": 125
+        },
+        "events": ["mid-term season", "break-up"]
+    },
+    {
+        "date": "2023-08-04",
+        "sleep_duration": 5.5,
+        "num_steps": 7000,
+        "heart_rate_pie_chart": {
+            "50-59": 0.03,
+            "60-69": 0.15,
+            "70-79": 0.1,
+            "80-89": 0.1,
+            "90-99": 0.19,
+            "100-109": 0.2,
+            "110-119": 0.18,
+            "120-129": 0.05
+        },
+        "weight": 150,
+        "timeSpent": {
+            "class": 250,
+            "study": 320,
+            "leisure": 160,
+            "exercise": 80,
+            "reading": 35,
+            "socializing": 40,
+            "eating": 100
+        },
+        "events": ["mid-term season", "break-up"]
+    },
+    {
+        "date": "2023-08-05",
+        "sleep_duration": 7.5,
+        "num_steps": 5500,
+        "heart_rate_pie_chart": {
+            "50-59": 0.07,
+            "60-69": 0.1,
+            "70-79": 0.12,
+            "80-89": 0.09,
+            "90-99": 0.2,
+            "100-109": 0.19,
+            "110-119": 0.15,
+            "120-129": 0.08
+        },
+        "weight": 153,
+        "timeSpent": {
+            "class": 230,
+            "study": 290,
+            "leisure": 210,
+            "exercise": 75,
+            "reading": 30,
+            "socializing": 55,
+            "eating": 125
+        },
+        "events": ["break-up"]
+    },
+    {
+        "date": "2023-09-01",
+        "sleep_duration": 7,
+        "num_steps": 6000,
+        "heart_rate_pie_chart": {
+            "50-59": 0.04,
+            "60-69": 0.09,
+            "70-79": 0.11,
+            "80-89": 0.1,
+            "90-99": 0.22,
+            "100-109": 0.2,
+            "110-119": 0.18,
+            "120-129": 0.06
+        },
+        "weight": 152,
+        "timeSpent": {
+            "class": 240,
+            "study": 290,
+            "leisure": 200,
+            "exercise": 70,
+            "reading": 25,
+            "socializing": 50,
+            "eating": 120
+        },
+        "events": ["mid-term season"]
+    },
+    {
+        "date": "2023-09-02",
+        "sleep_duration": 6.8,
+        "num_steps": 6500,
+        "heart_rate_pie_chart": {
+            "50-59": 0.05,
+            "60-69": 0.12,
+            "70-79": 0.1,
+            "80-89": 0.1,
+            "90-99": 0.21,
+            "100-109": 0.18,
+            "110-119": 0.18,
+            "120-129": 0.06
+        },
+        "weight": 151,
+        "timeSpent": {
+            "class": 230,
+            "study": 300,
+            "leisure": 190,
+            "exercise": 75,
+            "reading": 20,
+            "socializing": 55,
+            "eating": 110
+        },
+        "events": []
+    },
+    {
+        "date": "2023-09-03",
+        "sleep_duration": 7.5,
+        "num_steps": 5000,
+        "heart_rate_pie_chart": {
+            "50-59": 0.04,
+            "60-69": 0.1,
+            "70-79": 0.12,
+            "80-89": 0.09,
+            "90-99": 0.2,
+            "100-109": 0.2,
+            "110-119": 0.18,
+            "120-129": 0.07
+        },
+        "weight": 150,
+        "timeSpent": {
+            "class": 220,
+            "study": 310,
+            "leisure": 180,
+            "exercise": 65,
+            "reading": 30,
+            "socializing": 60,
+            "eating": 115
+        },
+        "events": ["home"]
+    },
+    {
+        "date": "2023-09-04",
+        "sleep_duration": 5.8,
+        "num_steps": 7500,
+        "heart_rate_pie_chart": {
+            "50-59": 0.02,
+            "60-69": 0.15,
+            "70-79": 0.11,
+            "80-89": 0.12,
+            "90-99": 0.2,
+            "100-109": 0.19,
+            "110-119": 0.18,
+            "120-129": 0.03
+        },
+        "weight": 153,
+        "timeSpent": {
+            "class": 250,
+            "study": 280,
+            "leisure": 160,
+            "exercise": 80,
+            "reading": 35,
+            "socializing": 40,
+            "eating": 125
+        },
+        "events": ["Hackathon"]
+    },
+    {
+        "date": "2023-09-05",
+        "sleep_duration": 6.7,
+        "num_steps": 5700,
+        "heart_rate_pie_chart": {
+            "50-59": 0.06,
+            "60-69": 0.1,
+            "70-79": 0.12,
+            "80-89": 0.1,
+            "90-99": 0.2,
+            "100-109": 0.18,
+            "110-119": 0.16,
+            "120-129": 0.08
+        },
+        "weight": 151,
+        "timeSpent": {
+            "class": 230,
+            "study": 300,
+            "leisure": 170,
+            "exercise": 70,
+            "reading": 20,
+            "socializing": 60,
+            "eating": 120
+        },
+        "events": ["Hackathon"]
+    }
+]
 
 function updateCalendar(data, monthYear) {
     const calendar = d3.select("#calendar");
