@@ -1,1 +1,5 @@
 # CS416-narrative-visualization-final-project
+
+This is a data visualization where all of the data came from me! I collected the data from my Galaxy Watch 5 smartwatch (for health-related metrics like sleep, steps walked, heart rate, etc.) from my phone (used for my location log and to log my weight-training sessions), from my google calendar (to get an idea of how I spend my time), and computer (to understand when and how frequently I use my computer)
+
+This data visualization will show my freshman year of college month-by-month. Important information about myself will be highlighted, and critical moments in time will be highlighted. When clicking on a specific day, the day will appear larger and more personal information will appear. Information will include how much sleep I got the night before, my weight on that day, a breakdown of how I spent my day as a pie chart. Some group of days will be highlighted with a specific color to represent on-going periods of my time. They can be things such as mid-term season, when I was home from college, if there were any events at UIUC. 

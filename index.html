@@ -1,1 +1,36 @@
-<h1>Hi</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Freshman Year Data Visualization</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        /* Add styles for better visualization */
+        .day {
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .highlighted {
+            fill: yellow;
+        }
+
+        .tooltip {
+            position: absolute;
+            text-align: center;
+            width: 200px;
+            height: auto;
+            padding: 5px;
+            background: lightsteelblue;
+            border: 1px solid;
+            border-radius: 8px;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <svg id="visualization" width="1000" height="800"></svg>
+    <div id="tooltip" class="tooltip" style="opacity: 0;"></div>
+    <script src="script.js"></script>
+</body>
+</html>
