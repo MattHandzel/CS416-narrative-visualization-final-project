@@ -1,4 +1,5 @@
 let currentDate = new Date("2023-09-01"); // Initial date to display
+let allData = []; // To store all data after initial load
 
 const svg = d3.select("#calendar");
 const tooltip = d3.select("#tooltip");
@@ -7,20 +8,19 @@ const parseDate = d3.timeParse("%Y-%m-%d");
 const formatDate = d3.timeFormat("%B %d, %Y");
 const formatMonthYear = d3.timeFormat("%B %Y");
 
-function loadData(monthYear) {
-    d3.json("./data.json").then(data => {
-        data.forEach(d => {
-            d.date = parseDate(d.date);
-            d.sleep_duration = +d.sleep_duration;
-            d.num_steps = +d.num_steps;
-            d.weight = +d.weight;
-        });
-
-        updateCalendar(data, monthYear);
-    }).catch(error => {
-        console.error("Error loading the JSON data:", error);
+d3.json("./data.json").then(data => {
+    data.forEach(d => {
+        d.date = parseDate(d.date);
+        d.sleep_duration = +d.sleep_duration;
+        d.num_steps = +d.num_steps;
+        d.weight = +d.weight;
     });
-}
+
+    allData = data; // Store all data
+    updateCalendar(data, currentDate);
+}).catch(error => {
+    console.error("Error loading the JSON data:", error);
+});
 
 function updateCalendar(data, monthYear) {
     const calendar = d3.select("#calendar");
@@ -89,11 +89,24 @@ function updateCalendar(data, monthYear) {
 
 function changeMonth(offset) {
     currentDate.setMonth(currentDate.getMonth() + offset);
-    loadData(currentDate);
+    const filteredData = allData.filter(d => d.date.getMonth() === currentDate.getMonth() && d.date.getFullYear() === currentDate.getFullYear());
+    updateCalendar(filteredData, currentDate);
 }
 
 document.getElementById("prevMonth").addEventListener("click", () => changeMonth(-1));
 document.getElementById("nextMonth").addEventListener("click", () => changeMonth(1));
 
 // Initial load
-loadData(currentDate);
+d3.json("./data.json").then(data => {
+    data.forEach(d => {
+        d.date = parseDate(d.date);
+        d.sleep_duration = +d.sleep_duration;
+        d.num_steps = +d.num_steps;
+        d.weight = +d.weight;
+    });
+
+    allData = data; // Store all data
+    updateCalendar(data, currentDate);
+}).catch(error => {
+    console.error("Error loading the JSON data:", error);
+});
