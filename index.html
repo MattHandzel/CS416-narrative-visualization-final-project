@@ -2,10 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Freshman Year Data Visualization</title>
+    <title>September Calendar Visualization</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
-        /* Add styles for better visualization */
         .day {
             cursor: pointer;
             transition: transform 0.2s;
@@ -26,10 +25,34 @@
             border-radius: 8px;
             pointer-events: none;
         }
+
+        .calendar {
+            font-family: Arial, sans-serif;
+            margin: 50px auto;
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            width: 100%;
+            max-width: 800px;
+            background-color: #ccc;
+        }
+
+        .day,
+        .header {
+            padding: 10px;
+            background-color: #fff;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .header {
+            font-weight: bold;
+            background-color: #f7f7f7;
+        }
     </style>
 </head>
 <body>
-    <svg id="visualization" width="1000" height="800"></svg>
+    <div id="calendar" class="calendar"></div>
     <div id="tooltip" class="tooltip" style="opacity: 0;"></div>
     <script src="script.js"></script>
 </body>
