@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Calendar Visualization</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
     <style>
         .day {
             cursor: pointer;
@@ -34,7 +35,7 @@
         }
 
         .grid {
-            font-family: Arial, sans-serif;
+            font-family: "HackNerd", sans-serif;
             margin: 50px auto;
             display: grid;
             grid-template-columns: repeat(7, 1fr);
@@ -51,10 +52,11 @@
             text-align: center;
             box-sizing: border-box;
         }
+
         .monthYearName {
             text-align: center;
             box-sizing: border-box;
-            font-family: Arial, sans-serif;
+            font-family: "HackNerd", sans-serif;
             font-size: 20px;
             margin: 50px auto;
             gap: 1px;
@@ -67,7 +69,7 @@
             font-weight: bold;
             background-color: #f7f7f7;
         }
-        
+
         .buttons {
             display: flex;
             justify-content: center;
@@ -87,10 +89,8 @@
         <button id="nextMonth">Next Month</button>
     </div>
     <div id="calendar" class="calendar">
-
-    <div id="monthYearName" class="monthYearName"></div>
-    <div id="grid" class="grid"></div>
-
+        <div id="monthYearName" class="monthYearName"></div>
+        <div id="grid" class="grid"></div>
     </div>
     <div id="tooltip" class="tooltip" style="opacity: 0;">
         <div id="tooltip-text"></div>
