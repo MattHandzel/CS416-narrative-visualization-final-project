@@ -36,6 +36,7 @@ function updateCalendar(monthYear) {
 
     const monthName = formatMonthYear(monthYear);
     const monthDays = d3.timeDays(d3.timeMonth(monthYear), d3.timeMonth.offset(monthYear, 1));
+    monthDays.pop()
 
     const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     const monthStartDay = monthDays[0].getDay();
