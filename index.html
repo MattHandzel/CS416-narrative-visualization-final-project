@@ -33,7 +33,7 @@
             margin-top: 10px;
         }
 
-        .calendar {
+        .grid {
             font-family: Arial, sans-serif;
             margin: 50px auto;
             display: grid;
@@ -54,7 +54,13 @@
         .monthYearName {
             text-align: center;
             box-sizing: border-box;
-            width: 1000px;
+            font-family: Arial, sans-serif;
+            font-size: 20px;
+            margin: 50px auto;
+            gap: 1px;
+            width: 100%;
+            max-width: 800px;
+            background-color: #ccc;
         }
 
         .header {
@@ -80,7 +86,12 @@
         <button id="prevMonth">Previous Month</button>
         <button id="nextMonth">Next Month</button>
     </div>
-    <div id="calendar" class="calendar"></div>
+    <div id="calendar" class="calendar">
+
+    <div id="monthYearName" class="monthYearName"></div>
+    <div id="grid" class="grid"></div>
+
+    </div>
     <div id="tooltip" class="tooltip" style="opacity: 0;">
         <div id="tooltip-text"></div>
         <div id="heart-rate-pie-chart"></div>

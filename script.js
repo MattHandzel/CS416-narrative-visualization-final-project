@@ -29,8 +29,10 @@ d3.json("./data.json").then(data => {
 });
 
 function updateCalendar(monthYear) {
+    const grid = d3.select("#grid");
     const calendar = d3.select("#calendar");
-    calendar.selectAll("*").remove(); // Clear existing calendar
+    const monthYearName = d3.select("#monthYearName");
+    grid.selectAll("*").remove(); // Clear existing calendar
 
     const monthName = formatMonthYear(monthYear);
     const monthDays = d3.timeDays(d3.timeMonth(monthYear), d3.timeMonth.offset(monthYear, 1));
@@ -38,26 +40,24 @@ function updateCalendar(monthYear) {
     const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     const monthStartDay = monthDays[0].getDay();
 
-    calendar.append("div")
-        .attr("class", "monthYearName")
-        .text(monthName);
+    monthYearName.text(monthName);
 
     dayNames.forEach(day => {
-        calendar.append("div")
+        grid.append("div")
             .attr("class", "header")
             .attr("colspan", 7)
             .text(day);
     });
 
     for (let i = 0; i < monthStartDay; i++) {
-        calendar.append("div")
+        grid.append("div")
             .attr("class", "day empty");
     }
 
     monthDays.forEach(date => {
         const dayData = allData.find(d => d3.timeDay(d.date).getTime() === date.getTime());
 
-        const dayCell = calendar.append("div")
+        const dayCell = grid.append("div")
             .attr("class", "day")
             .text(date.getDate())
             .on("mouseover", function(event) {
@@ -149,3 +149,5 @@ d3.json("./data.json").then(data => {
 }).catch(error => {
     console.error("Error loading the JSON data:", error);
 });
+
+console.log(allData);
