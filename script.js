@@ -55,73 +55,77 @@ function updateCalendar(monthYear) {
             .attr("class", "day")
             .text(date.getDate())
             .on("mouseover", function(event) {
-                tooltip.transition().duration(200).style("opacity", .9);
+                tooltip.transition().duration(100).style("opacity", 1);
 
                 let tooltipContent = `<strong>Date:</strong> ${formatDate(date)}<br>`;
 
-                if (dayData) {
-                    tooltipContent += `
-                        <strong>Sleep:</strong> ${Math.floor(dayData.sleep_duration)} hours ${Math.round(dayData.sleep_duration * 60 - Math.floor(dayData.sleep_duration) * 60)} minutes<br>
-                        <strong>Steps:</strong> ${Math.round(dayData.num_steps)}<br>
-                        <strong>Weight:</strong> ${Math.round(dayData.weight) == 0 ? "NaN" : Math.round(dayData.weight)} lbs<br>
-                    `;
+        if (dayData) {
+            tooltipContent += `
+                <strong>Sleep:</strong> ${Math.floor(dayData.sleep_duration)} hours ${Math.round(dayData.sleep_duration * 60 - Math.floor(dayData.sleep_duration) * 60)} minutes<br>
+                <strong>Steps:</strong> ${Math.round(dayData.num_steps)}<br>
+                <strong>Weight:</strong> ${Math.round(dayData.weight) == 0 ? "NaN" : Math.round(dayData.weight)} lbs<br>
+            `;
 
-                    const heartRateData = Object.keys(dayData.heart_rate_pie_chart).map(key => {
-                        return { label: key, value: Math.round(dayData.heart_rate_pie_chart[key]) };
-                    });
+            const heartRateData = Object.keys(dayData.heart_rate_pie_chart).map(key => {
+                return { label: key, value: Math.round(dayData.heart_rate_pie_chart[key]) };
+            });
 
-                    const heartRateArcs = pie(heartRateData);
-                    const heartRateSvg = heartRatePieChart.selectAll("svg").data([null]);
+            const heartRateArcs = pie(heartRateData);
+            const heartRateSvg = heartRatePieChart.selectAll("svg").data([null]);
 
-                    const heartRateSvgEnter = heartRateSvg.enter().append("svg")
-                        .attr("width", 100)
-                        .attr("height", 100)
-                        .append("g")
-                        .attr("transform", "translate(50,50)");
+            const heartRateSvgEnter = heartRateSvg.enter().append("svg")
+                .attr("width", 150)
+                .attr("height", 150)
+                .append("g")
+                .attr("transform", "translate(75,75)");
 
-                    heartRateSvgEnter.merge(heartRateSvg).selectAll("path")
-                        .data(heartRateArcs)
-                        .join("path")
-                        .attr("d", arc)
-                        .attr("fill", (d, i) => d3.schemeCategory10[i]);
+            heartRateSvgEnter.merge(heartRateSvg).selectAll("path")
+                .data(heartRateArcs)
+                .join("path")
+                .attr("d", arc)
+                .attr("fill", (d, i) => "#" + colorPallet[i % colorPallet.length]);
 
-                    heartRateSvgEnter.merge(heartRateSvg).selectAll("text")
-                        .data(heartRateArcs)
-                        .join("text")
-                        .attr("transform", d => `translate(${arc.centroid(d)})`)
-                        .attr("dy", "0.35em")
-                        .text(d => d.data.label);
+            heartRateSvgEnter.merge(heartRateSvg).selectAll("text")
+                .data(heartRateArcs)
+                .join("text")
+                .attr("transform", d => `translate(${arc.centroid(d)})`)
+                .attr("dy", "0.35em")
+                .attr("font-size", "10px")
+                .attr("text-anchor", "middle")
+                .text(d => d.data.label);
 
-                    const timeSpentData = Object.keys(dayData.timeSpent).map(key => {
-                        return { label: key, value: Math.round(dayData.timeSpent[key]) };
-                    });
+            const timeSpentData = Object.keys(dayData.timeSpent).map(key => {
+                return { label: key, value: Math.round(dayData.timeSpent[key]) };
+            });
 
-                    const timeSpentArcs = pie(timeSpentData);
-                    const timeSpentSvg = timeSpentPieChart.selectAll("svg").data([null]);
+            const timeSpentArcs = pie(timeSpentData);
+            const timeSpentSvg = timeSpentPieChart.selectAll("svg").data([null]);
 
-                    const timeSpentSvgEnter = timeSpentSvg.enter().append("svg")
-                        .attr("width", 100)
-                        .attr("height", 100)
-                        .append("g")
-                        .attr("transform", "translate(50,50)");
+            const timeSpentSvgEnter = timeSpentSvg.enter().append("svg")
+                .attr("width", 150)
+                .attr("height", 150)
+                .append("g")
+                .attr("transform", "translate(75,75)");
 
-                    timeSpentSvgEnter.merge(timeSpentSvg).selectAll("path")
-                        .data(timeSpentArcs)
-                        .join("path")
-                        .attr("d", arc)
-                        .attr("fill", (d, i) => "#" + colorPallet[i]);
+            timeSpentSvgEnter.merge(timeSpentSvg).selectAll("path")
+                .data(timeSpentArcs)
+                .join("path")
+                .attr("d", arc)
+                .attr("fill", (d, i) => "#" + colorPallet[i % colorPallet.length]);
 
-                    timeSpentSvgEnter.merge(timeSpentSvg).selectAll("text")
-                        .data(timeSpentArcs)
-                        .join("text")
-                        .attr("transform", d => `translate(${arc.centroid(d)})`)
-                        .attr("dy", "0.35em")
-                        .text(d => {
-                            const total = d3.sum(timeSpentArcs.map(d => d.value));
-                            const percentage = (d.value / total) * 100;
-                            return percentage > 10 ? d.data.label : '';
-                        });
-                }
+            timeSpentSvgEnter.merge(timeSpentSvg).selectAll("text")
+                .data(timeSpentArcs)
+                .join("text")
+                .attr("transform", d => `translate(${arc.centroid(d)})`)
+                .attr("dy", "0.35em")
+                .attr("font-size", "10px")
+                .attr("text-anchor", "middle")
+                .text(d => {
+                    const total = d3.sum(timeSpentArcs.map(d => d.value));
+                    const percentage = (d.value / total) * 100;
+                    return percentage > 5 ? d.data.label : '';
+                });
+          }
 
                 if (_event) {
                     tooltipContent += `
@@ -214,6 +218,7 @@ d3.csv(data_path).then(data => {
     console.error("Error loading the CSV data:", error);
 });
 
+// bug fixing lol
 changeMonth(1);
 changeMonth(1);
 changeMonth(1);
