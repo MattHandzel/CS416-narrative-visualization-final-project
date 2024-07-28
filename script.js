@@ -1,5 +1,5 @@
-let currentDate = new Date("2023-09-01"); // Initial date to display
-let allData = []; // To store all data after initial load
+const currentDate = new Date("2023-08-01");
+let allData = []; 
 
 const svg = d3.select("#calendar");
 const tooltip = d3.select("#tooltip");
@@ -14,29 +14,49 @@ const formatMonthYear = d3.timeFormat("%B %Y");
 const pie = d3.pie().value(d => d.value);
 const arc = d3.arc().innerRadius(0).outerRadius(50);
 
-d3.json("./data.json").then(data => {
+d3.csv("./data.csv").then(data => {
     data.forEach(d => {
         d.date = parseDate(d.date);
         d.sleep_duration = +d.sleep_duration;
         d.num_steps = +d.num_steps;
         d.weight = +d.weight;
+        d.heart_rate_pie_chart = {
+            high: +d.stress_max,
+            low: +d.stress_min,
+        };
+        d.timeSpent = {
+            homework: +d.HOMEWORK,
+            exercising: +d.EXERCISING,
+            school: +d.SCHOOL,
+            girlfriend: +d.GIRLFRIEND,
+            productivity: +d.PRODUCTIVITY,
+            selfImprovement: +d['SELF IMPROVEMENT'],
+            career: +d.CAREER,
+            chores: +d.CHORES,
+            studentOrganizations: +d['STUDENT ORGANIZATIONS'],
+            personalProjects: +d['PERSONAL PROJECTS'],
+            freeTime: +d['FREE TIME'],
+            eating: +d.EATING,
+            socializing: +d.SOCIALIZING,
+            research: +d.RESEARCH,
+        };
     });
 
     allData = data; // Store all data
     updateCalendar(currentDate);
 }).catch(error => {
-    console.error("Error loading the JSON data:", error);
+    console.error("Error loading the CSV data:", error);
 });
 
 function updateCalendar(monthYear) {
     const grid = d3.select("#grid");
     const calendar = d3.select("#calendar");
     const monthYearName = d3.select("#monthYearName");
-    grid.selectAll("*").remove(); // Clear existing calendar
+    grid.selectAll("*").remove();
 
     const monthName = formatMonthYear(monthYear);
     const monthDays = d3.timeDays(d3.timeMonth(monthYear), d3.timeMonth.offset(monthYear, 1));
-    monthDays.pop()
+    monthDays.pop();
 
     const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     const monthStartDay = monthDays[0].getDay();
@@ -121,7 +141,7 @@ function updateCalendar(monthYear) {
                 tooltip.transition().duration(500).style("opacity", 0);
             });
 
-        if (dayData && dayData.events.length) {
+        if (dayData && dayData.events && dayData.events.length) {
             dayCell.style("background-color", "lightcoral");
         }
     });
@@ -137,18 +157,38 @@ document.getElementById("prevMonth").addEventListener("click", () => changeMonth
 document.getElementById("nextMonth").addEventListener("click", () => changeMonth(1));
 
 // Initial load
-d3.json("./data.json").then(data => {
+d3.csv("./data.csv").then(data => {
     data.forEach(d => {
         d.date = parseDate(d.date);
         d.sleep_duration = +d.sleep_duration;
         d.num_steps = +d.num_steps;
         d.weight = +d.weight;
+        d.heart_rate_pie_chart = {
+            high: +d.stress_max,
+            low: +d.stress_min,
+        };
+        d.timeSpent = {
+            homework: +d.HOMEWORK,
+            exercising: +d.EXERCISING,
+            school: +d.SCHOOL,
+            girlfriend: +d.GIRLFRIEND,
+            productivity: +d.PRODUCTIVITY,
+            selfImprovement: +d['SELF IMPROVEMENT'],
+            career: +d.CAREER,
+            chores: +d.CHORES,
+            studentOrganizations: +d['STUDENT ORGANIZATIONS'],
+            personalProjects: +d['PERSONAL PROJECTS'],
+            freeTime: +d['FREE TIME'],
+            eating: +d.EATING,
+            socializing: +d.SOCIALIZING,
+            research: +d.RESEARCH,
+        };
     });
 
     allData = data; // Store all data
     updateCalendar(currentDate);
 }).catch(error => {
-    console.error("Error loading the JSON data:", error);
+    console.error("Error loading the CSV data:", error);
 });
 
 console.log(allData);
