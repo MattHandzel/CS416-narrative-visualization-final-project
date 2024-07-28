@@ -14,40 +14,6 @@ const formatMonthYear = d3.timeFormat("%B %Y");
 const pie = d3.pie().value(d => d.value);
 const arc = d3.arc().innerRadius(0).outerRadius(50);
 
-d3.csv("./data.csv").then(data => {
-    data.forEach(d => {
-        d.date = parseDate(d.date);
-        d.sleep_duration = +d.sleep_duration;
-        d.num_steps = +d.num_steps;
-        d.weight = +d.weight;
-        d.heart_rate_pie_chart = {
-            high: +d.stress_max,
-            low: +d.stress_min,
-        };
-        d.timeSpent = {
-            homework: +d.HOMEWORK,
-            exercising: +d.EXERCISING,
-            school: +d.SCHOOL,
-            girlfriend: +d.GIRLFRIEND,
-            productivity: +d.PRODUCTIVITY,
-            selfImprovement: +d['SELF IMPROVEMENT'],
-            career: +d.CAREER,
-            chores: +d.CHORES,
-            studentOrganizations: +d['STUDENT ORGANIZATIONS'],
-            personalProjects: +d['PERSONAL PROJECTS'],
-            freeTime: +d['FREE TIME'],
-            eating: +d.EATING,
-            socializing: +d.SOCIALIZING,
-            research: +d.RESEARCH,
-        };
-    });
-
-    allData = data; // Store all data
-    updateCalendar(currentDate);
-}).catch(error => {
-    console.error("Error loading the CSV data:", error);
-});
-
 function updateCalendar(monthYear) {
     const grid = d3.select("#grid");
     const calendar = d3.select("#calendar");
@@ -113,7 +79,6 @@ function updateCalendar(monthYear) {
                         .attr("d", arc)
                         .attr("fill", (d, i) => d3.schemeCategory10[i]);
 
-                    // Update time spent pie chart
                     const timeSpentData = Object.keys(dayData.timeSpent).map(key => {
                         return { label: key, value: dayData.timeSpent[key] };
                     });
@@ -156,8 +121,8 @@ function changeMonth(offset) {
 document.getElementById("prevMonth").addEventListener("click", () => changeMonth(-1));
 document.getElementById("nextMonth").addEventListener("click", () => changeMonth(1));
 
-// Initial load
-d3.csv("./data.csv").then(data => {
+data_path = "./data.csv";
+d3.csv(data_path).then(data => {
     data.forEach(d => {
         d.date = parseDate(d.date);
         d.sleep_duration = +d.sleep_duration;
@@ -185,7 +150,7 @@ d3.csv("./data.csv").then(data => {
         };
     });
 
-    allData = data; // Store all data
+    allData = data;
     updateCalendar(currentDate);
 }).catch(error => {
     console.error("Error loading the CSV data:", error);
