@@ -1,5 +1,6 @@
 const currentDate = new Date("2023-08-01");
-let allData = []; 
+let allData = [];
+let eventsData = [];
 
 const svg = d3.select("#calendar");
 const tooltip = d3.select("#tooltip");
@@ -13,6 +14,8 @@ const formatMonthYear = d3.timeFormat("%B %Y");
 
 const pie = d3.pie().value(d => d.value);
 const arc = d3.arc().innerRadius(0).outerRadius(50);
+
+const colorPallet = ["55D6BE", "7D5BA6", "DDDDDD", "706C61", "FFBA08", "399C5", "F4A261", "2A9D8F", "E9C46A", "E76F51", "F4A261", "2A9D8F", "E9C46A", "E76F51", "F4A261", "2A9D8F", "E9C46A", "E76F51", "F4A261", "2A9D8F", "E9C46A", "E76F51", "F4A261", "2A9D8F", "E9C46A", "E76F51", "F4A261", "2A9D8F", "E9C46A", "E76F51", "F4A261", "2A9D8F", "E9C46A", "E76F51"];
 
 function updateCalendar(monthYear) {
     const grid = d3.select("#grid");
@@ -44,22 +47,24 @@ function updateCalendar(monthYear) {
     monthDays.forEach(date => {
         const dayData = allData.find(d => d3.timeDay(d.date).getTime() === date.getTime());
 
+        const _event = eventsData.find(e => parseDate(e.start_date).getTime() <= date.getTime() && date.getTime() <= parseDate(e.end_date).getTime());
         const dayCell = grid.append("div")
             .attr("class", "day")
             .text(date.getDate())
             .on("mouseover", function(event) {
-                if (dayData) {
-                    tooltip.transition().duration(200).style("opacity", .9);
+                tooltip.transition().duration(200).style("opacity", .9);
 
-                    tooltipText.html(`
-                        <strong>Date:</strong> ${formatDate(dayData.date)}<br>
-                        <strong>Sleep:</strong> ${dayData.sleep_duration} hours<br>
-                        <strong>Steps:</strong> ${dayData.num_steps}<br>
-                        <strong>Weight:</strong> ${dayData.weight} lbs<br>
-                    `);
+                let tooltipContent = `<strong>Date:</strong> ${formatDate(date)}<br>`;
+
+                if (dayData) {
+                    tooltipContent += `
+                        <strong>Sleep:</strong> ${Math.round(dayData.sleep_duration)} hours<br>
+                        <strong>Steps:</strong> ${Math.round(dayData.num_steps)}<br>
+                        <strong>Weight:</strong> ${Math.round(dayData.weight)} lbs<br>
+                    `;
 
                     const heartRateData = Object.keys(dayData.heart_rate_pie_chart).map(key => {
-                        return { label: key, value: dayData.heart_rate_pie_chart[key] };
+                        return { label: key, value: Math.round(dayData.heart_rate_pie_chart[key]) };
                     });
 
                     const heartRateArcs = pie(heartRateData);
@@ -77,8 +82,15 @@ function updateCalendar(monthYear) {
                         .attr("d", arc)
                         .attr("fill", (d, i) => d3.schemeCategory10[i]);
 
+                    heartRateSvgEnter.merge(heartRateSvg).selectAll("text")
+                        .data(heartRateArcs)
+                        .join("text")
+                        .attr("transform", d => `translate(${arc.centroid(d)})`)
+                        .attr("dy", "0.35em")
+                        .text(d => d.data.label);
+
                     const timeSpentData = Object.keys(dayData.timeSpent).map(key => {
-                        return { label: key, value: dayData.timeSpent[key] };
+                        return { label: key, value: Math.round(dayData.timeSpent[key]) };
                     });
 
                     const timeSpentArcs = pie(timeSpentData);
@@ -96,20 +108,46 @@ function updateCalendar(monthYear) {
                         .attr("d", arc)
                         .attr("fill", (d, i) => d3.schemeCategory10[i]);
 
-                    tooltip.style("left", (event.pageX + 5) + "px")
-                           .style("top", (event.pageY - 28) + "px");
+                    timeSpentSvgEnter.merge(timeSpentSvg).selectAll("text")
+                        .data(timeSpentArcs)
+                        .join("text")
+                        .attr("transform", d => `translate(${arc.centroid(d)})`)
+                        .attr("dy", "0.35em")
+                        .text(d => d.data.label);
                 }
+
+                if (_event) {
+                    tooltipContent += `
+                        <strong>Event:</strong> ${_event.name}<br>
+                        <strong>Description:</strong> ${_event.description}
+                    `;
+                }
+
+                tooltipText.html(tooltipContent);
+                tooltip.style("left", (event.pageX + 5) + "px").style("top", (event.pageY - 28) + "px");
             })
             .on("mouseout", function() {
                 tooltip.transition().duration(500).style("opacity", 0);
             });
 
-        if(dayData) {
-          dayCell.style("background-color", "lightgreen");
+        if(!dayData) {
+          dayCell.style("background-color", "#FC6471");
         }
-        if (dayData && dayData.events && dayData.events.length) {
-            dayCell.style("background-color", "lightcoral");
+      else if(dayData && _event){
+        if(_event.color.length < 5){
+
+          dayCell.style("background-color", "#" + colorPallet[_event.color])
+          
         }
+        else{
+          dayCell.style("background-color", _event.color);
+        }
+
+        } 
+      else{
+          // if there is data
+        dayCell.style("background-color", "#BCECB9");
+      }
     });
 }
 
@@ -123,32 +161,29 @@ function changeMonth(offset) {
 document.getElementById("prevMonth").addEventListener("click", () => changeMonth(-1));
 document.getElementById("nextMonth").addEventListener("click", () => changeMonth(1));
 
-data_path = "./data.csv";
+const data_path = "./data.csv";
 d3.csv(data_path).then(data => {
     data.forEach(d => {
         d.date = parseDate(d.date);
-        d.sleep_duration = +d.sleep_duration;
-        d.num_steps = +d.num_steps;
-        d.weight = +d.weight;
+        d.sleep_duration = Math.round(+d.sleep_duration);
+        d.num_steps = Math.round(+d.num_steps);
+        d.weight = Math.round(+d.weight);
         d.heart_rate_pie_chart = {
-            high: +d.stress_max,
-            low: +d.stress_min,
+            high: Math.round(+d.stress_max),
+            low: Math.round(+d.stress_min),
         };
         d.timeSpent = {
-            homework: +d.HOMEWORK,
-            exercising: +d.EXERCISING,
-            school: +d.SCHOOL,
-            girlfriend: +d.GIRLFRIEND,
-            productivity: +d.PRODUCTIVITY,
-            selfImprovement: +d['SELF IMPROVEMENT'],
-            career: +d.CAREER,
-            chores: +d.CHORES,
-            studentOrganizations: +d['STUDENT ORGANIZATIONS'],
-            personalProjects: +d['PERSONAL PROJECTS'],
-            freeTime: +d['FREE TIME'],
-            eating: +d.EATING,
-            socializing: +d.SOCIALIZING,
-            research: +d.RESEARCH,
+            homework: Math.round(+d.HOMEWORK),
+            exercising: Math.round(+d.EXERCISING),
+            school: Math.round(+d.SCHOOL),
+            productivity: Math.round(+d.PRODUCTIVITY),
+            selfImprovement: Math.round(+d['SELF IMPROVEMENT']),
+            career: Math.round(+d.CAREER),
+            chores: Math.round(+d.CHORES),
+            studentOrganizations: Math.round(+d['STUDENT ORGANIZATIONS']),
+            eating: Math.round(+d.EATING),
+            socializing: Math.round(+d.SOCIALIZING),
+            research: Math.round(+d.RESEARCH),
         };
     });
 
@@ -158,4 +193,15 @@ d3.csv(data_path).then(data => {
     console.error("Error loading the CSV data:", error);
 });
 
-console.log(allData);
+// Load the events data
+d3.json("events.json").then(data => {
+    eventsData = Object.keys(data).map(key => ({
+        name: key,
+        description: data[key].description,
+        start_date: data[key].start_date,
+        end_date: data[key].end_date,
+        color: data[key].color
+    }));
+}).catch(error => {
+    console.error("Error loading the events JSON data:", error);
+});
