@@ -1,7 +1,7 @@
 const currentDate = new Date("2023-08-01");
 let allData = [];
 let eventsData = [];
-
+let cards = [];
 
 print = console.log;
 
@@ -10,6 +10,7 @@ const tooltip = d3.select("#tooltip");
 const tooltipText = d3.select("#tooltip-text");
 const heartRatePieChart = d3.select("#heart-rate-pie-chart");
 const timeSpentPieChart = d3.select("#time-spent-pie-chart");
+const cardsContainer = d3.select("#cards-container");
 
 const parseDate = d3.timeParse("%Y-%m-%d");
 const formatDate = d3.timeFormat("%B %d, %Y");
@@ -18,7 +19,7 @@ const formatMonthYear = d3.timeFormat("%B %Y");
 const pie = d3.pie().value(d => d.value);
 const arc = d3.arc().innerRadius(0).outerRadius(50);
 
-const colorPallet = ["55D6BE", "7D5BA6", "DDDDDD", "706C61", "FFBA08", "399C5", "F4A261", "2A9D8F", "E9C46A", "E76F51", "F4A261", "2A9D8F", "E9C46A", "E76F51", "F4A261", "2A9D8F", "E9C46A", "E76F51", "F4A261", "2A9D8F", "E9C46A", "E76F51", "F4A261", "2A9D8F", "E9C46A", "E76F51", "F4A261", "2A9D8F", "E9C46A", "E76F51", "F4A261", "2A9D8F", "E9C46A", "E76F51"];
+const colorPallet = ["55D6BE", "7D5BA6", "DDDDDD", "706C61", "FFBA08", "399C5", "F4A261", "2A9D8F", "E9C46A", "E76F51", "F4A261", "2A9D8F", "E9C46A", "E76F51", "F4A261", "2A9D8F", "E9C46A", "E76F51", "F4A261", "2A9D8F", "E9C46A", "E76F51", "F4A261", "2A9D8F", "E9C46A", "E76F51"];
 
 function updateCalendar(monthYear) {
     const grid = d3.select("#grid");
@@ -49,7 +50,6 @@ function updateCalendar(monthYear) {
 
     monthDays.forEach(date => {
         const dayData = allData.find(d => d3.timeDay(d.date).getTime() === date.getTime());
-
         const _event = eventsData.find(e => parseDate(e.start_date).getTime() <= date.getTime() && date.getTime() <= parseDate(e.end_date).getTime());
         const dayCell = grid.append("div")
             .attr("class", "day")
@@ -59,73 +59,73 @@ function updateCalendar(monthYear) {
 
                 let tooltipContent = `<strong>Date:</strong> ${formatDate(date)}<br>`;
 
-        if (dayData) {
-            tooltipContent += `
-                <strong>Sleep:</strong> ${Math.floor(dayData.sleep_duration)} hours ${Math.round(dayData.sleep_duration * 60 - Math.floor(dayData.sleep_duration) * 60)} minutes<br>
-                <strong>Steps:</strong> ${Math.round(dayData.num_steps)}<br>
-                <strong>Weight:</strong> ${Math.round(dayData.weight) == 0 ? "NaN" : Math.round(dayData.weight)} lbs<br>
-            `;
+                if (dayData) {
+                    tooltipContent += `
+                        <strong>Sleep:</strong> ${Math.floor(dayData.sleep_duration)} hours ${Math.round(dayData.sleep_duration * 60 - Math.floor(dayData.sleep_duration) * 60)} minutes<br>
+                        <strong>Steps:</strong> ${Math.round(dayData.num_steps)}<br>
+                        <strong>Weight:</strong> ${Math.round(dayData.weight) == 0 ? "NaN" : Math.round(dayData.weight)} lbs<br>
+                    `;
 
-            const heartRateData = Object.keys(dayData.heart_rate_pie_chart).map(key => {
-                return { label: key, value: Math.round(dayData.heart_rate_pie_chart[key]) };
-            });
+                    const heartRateData = Object.keys(dayData.heart_rate_pie_chart).map(key => {
+                        return { label: key, value: Math.round(dayData.heart_rate_pie_chart[key]) };
+                    });
 
-            const heartRateArcs = pie(heartRateData);
-            const heartRateSvg = heartRatePieChart.selectAll("svg").data([null]);
+                    const heartRateArcs = pie(heartRateData);
+                    const heartRateSvg = heartRatePieChart.selectAll("svg").data([null]);
 
-            const heartRateSvgEnter = heartRateSvg.enter().append("svg")
-                .attr("width", 150)
-                .attr("height", 150)
-                .append("g")
-                .attr("transform", "translate(75,75)");
+                    const heartRateSvgEnter = heartRateSvg.enter().append("svg")
+                        .attr("width", 150)
+                        .attr("height", 150)
+                        .append("g")
+                        .attr("transform", "translate(75,75)");
 
-            heartRateSvgEnter.merge(heartRateSvg).selectAll("path")
-                .data(heartRateArcs)
-                .join("path")
-                .attr("d", arc)
-                .attr("fill", (d, i) => "#" + colorPallet[i % colorPallet.length]);
+                    heartRateSvgEnter.merge(heartRateSvg).selectAll("path")
+                        .data(heartRateArcs)
+                        .join("path")
+                        .attr("d", arc)
+                        .attr("fill", (d, i) => "#" + colorPallet[i % colorPallet.length]);
 
-            heartRateSvgEnter.merge(heartRateSvg).selectAll("text")
-                .data(heartRateArcs)
-                .join("text")
-                .attr("transform", d => `translate(${arc.centroid(d)})`)
-                .attr("dy", "0.35em")
-                .attr("font-size", "10px")
-                .attr("text-anchor", "middle")
-                .text(d => d.data.label);
+                    heartRateSvgEnter.merge(heartRateSvg).selectAll("text")
+                        .data(heartRateArcs)
+                        .join("text")
+                        .attr("transform", d => `translate(${arc.centroid(d)})`)
+                        .attr("dy", "0.35em")
+                        .attr("font-size", "10px")
+                        .attr("text-anchor", "middle")
+                        .text(d => d.data.label);
 
-            const timeSpentData = Object.keys(dayData.timeSpent).map(key => {
-                return { label: key, value: Math.round(dayData.timeSpent[key]) };
-            });
+                    const timeSpentData = Object.keys(dayData.timeSpent).map(key => {
+                        return { label: key, value: Math.round(dayData.timeSpent[key]) };
+                    });
 
-            const timeSpentArcs = pie(timeSpentData);
-            const timeSpentSvg = timeSpentPieChart.selectAll("svg").data([null]);
+                    const timeSpentArcs = pie(timeSpentData);
+                    const timeSpentSvg = timeSpentPieChart.selectAll("svg").data([null]);
 
-            const timeSpentSvgEnter = timeSpentSvg.enter().append("svg")
-                .attr("width", 150)
-                .attr("height", 150)
-                .append("g")
-                .attr("transform", "translate(75,75)");
+                    const timeSpentSvgEnter = timeSpentSvg.enter().append("svg")
+                        .attr("width", 150)
+                        .attr("height", 150)
+                        .append("g")
+                        .attr("transform", "translate(75,75)");
 
-            timeSpentSvgEnter.merge(timeSpentSvg).selectAll("path")
-                .data(timeSpentArcs)
-                .join("path")
-                .attr("d", arc)
-                .attr("fill", (d, i) => "#" + colorPallet[i % colorPallet.length]);
+                    timeSpentSvgEnter.merge(timeSpentSvg).selectAll("path")
+                        .data(timeSpentArcs)
+                        .join("path")
+                        .attr("d", arc)
+                        .attr("fill", (d, i) => "#" + colorPallet[i % colorPallet.length]);
 
-            timeSpentSvgEnter.merge(timeSpentSvg).selectAll("text")
-                .data(timeSpentArcs)
-                .join("text")
-                .attr("transform", d => `translate(${arc.centroid(d)})`)
-                .attr("dy", "0.35em")
-                .attr("font-size", "10px")
-                .attr("text-anchor", "middle")
-                .text(d => {
-                    const total = d3.sum(timeSpentArcs.map(d => d.value));
-                    const percentage = (d.value / total) * 100;
-                    return percentage > 5 ? d.data.label : '';
-                });
-          }
+                    timeSpentSvgEnter.merge(timeSpentSvg).selectAll("text")
+                        .data(timeSpentArcs)
+                        .join("text")
+                        .attr("transform", d => `translate(${arc.centroid(d)})`)
+                        .attr("dy", "0.35em")
+                        .attr("font-size", "10px")
+                        .attr("text-anchor", "middle")
+                        .text(d => {
+                            const total = d3.sum(timeSpentArcs.map(d => d.value));
+                            const percentage = (d.value / total) * 100;
+                            return percentage > 5 ? d.data.label : '';
+                        });
+                }
 
                 if (_event) {
                     tooltipContent += `
@@ -139,27 +139,40 @@ function updateCalendar(monthYear) {
             })
             .on("mouseout", function() {
                 tooltip.transition().duration(500).style("opacity", 0);
+            })
+            .on("click", function() {
+                const cardContent = tooltip.html();
+                cards.push(cardContent);
+                renderCards();
             });
 
-        if(!dayData) {
-          dayCell.style("background-color", "#FC6471");
+        if (!dayData) {
+            dayCell.style("background-color", "#FC6471");
+        } else if (dayData && _event) {
+            if (_event.color.length < 5) {
+                dayCell.style("background-color", "#" + colorPallet[_event.color])
+            } else {
+                dayCell.style("background-color", _event.color);
+            }
+        } else {
+            dayCell.style("background-color", "#BCECB9");
         }
-      else if(dayData && _event){
-        if(_event.color.length < 5){
-
-          dayCell.style("background-color", "#" + colorPallet[_event.color])
-          
-        }
-        else{
-          dayCell.style("background-color", _event.color);
-        }
-
-        } 
-      else{
-          // if there is data
-        dayCell.style("background-color", "#BCECB9");
-      }
     });
+}
+
+function renderCards() {
+    cardsContainer.selectAll(".card").remove();
+
+    cardsContainer.selectAll(".card")
+        .data(cards)
+        .enter()
+        .append("div")
+        .attr("class", "card")
+        .html(d => d)
+        .on("click", function(event, d) {
+            cards = cards.filter(card => card !== d);
+            renderCards();
+        });
 }
 
 function changeMonth(offset) {
@@ -168,7 +181,6 @@ function changeMonth(offset) {
     updateCalendar(currentDate);
 }
 
-// Allows the user to change the parameters
 document.getElementById("prevMonth").addEventListener("click", () => changeMonth(-1));
 document.getElementById("nextMonth").addEventListener("click", () => changeMonth(1));
 
@@ -201,15 +213,13 @@ d3.csv(data_path).then(data => {
             research: (+d.RESEARCH),
         };
 
-        // get the time spent sleeping, and sum up all of the amount of hours we have 
-        total_time = 0;
+        let total_time = 0;
         Object.keys(d.timeSpent).forEach(key => {
             total_time += d.timeSpent[key];
         });
         total_time += d.sleep_duration;
         d.timeSpent.sleep = d.sleep_duration;
         d.timeSpent.unknown = 24 - total_time;
-    
     });
 
     allData = data;
@@ -218,14 +228,13 @@ d3.csv(data_path).then(data => {
     console.error("Error loading the CSV data:", error);
 });
 
-// bug fixing lol
 changeMonth(1);
 changeMonth(1);
 changeMonth(1);
 changeMonth(-1);
 changeMonth(-1);
 changeMonth(-1);
-// Load the events data
+
 d3.json("events.json").then(data => {
     eventsData = Object.keys(data).map(key => ({
         name: key,

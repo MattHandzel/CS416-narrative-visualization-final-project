@@ -94,6 +94,29 @@
     .buttons button:hover {
         background-color: #434190;
     }
+
+    .cards-container {
+        margin-left: 10%;
+        margin-right: 10%;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+
+    }
+
+    .card {
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+
+    .card:hover {
+        transform: scale(1.05);
+    }
     </style>
 </head>
 <body>
@@ -110,6 +133,7 @@
         <div id="heart-rate-pie-chart"></div>
         <div id="time-spent-pie-chart"></div>
     </div>
+    <div id="cards-container" class="cards-container"></div>
     <script src="script.js"></script>
 </body>
 </html>
