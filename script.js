@@ -51,7 +51,6 @@ function updateCalendar(monthYear) {
                 if (dayData) {
                     tooltip.transition().duration(200).style("opacity", .9);
 
-                    // Update text
                     tooltipText.html(`
                         <strong>Date:</strong> ${formatDate(dayData.date)}<br>
                         <strong>Sleep:</strong> ${dayData.sleep_duration} hours<br>
@@ -59,7 +58,6 @@ function updateCalendar(monthYear) {
                         <strong>Weight:</strong> ${dayData.weight} lbs<br>
                     `);
 
-                    // Update heart rate pie chart
                     const heartRateData = Object.keys(dayData.heart_rate_pie_chart).map(key => {
                         return { label: key, value: dayData.heart_rate_pie_chart[key] };
                     });
@@ -106,6 +104,9 @@ function updateCalendar(monthYear) {
                 tooltip.transition().duration(500).style("opacity", 0);
             });
 
+        if(dayData) {
+          dayCell.style("background-color", "lightgreen");
+        }
         if (dayData && dayData.events && dayData.events.length) {
             dayCell.style("background-color", "lightcoral");
         }
@@ -118,6 +119,7 @@ function changeMonth(offset) {
     updateCalendar(currentDate);
 }
 
+// Allows the user to change the parameters
 document.getElementById("prevMonth").addEventListener("click", () => changeMonth(-1));
 document.getElementById("nextMonth").addEventListener("click", () => changeMonth(1));
 
