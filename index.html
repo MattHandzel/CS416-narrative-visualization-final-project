@@ -4,125 +4,197 @@
     <meta charset="UTF-8">
     <title>Calendar Visualization</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://raw.githubusercontent.com/susielu/d3-annotation/master/d3-annotation.js"></script>
     <link rel="stylesheet" href="styles.css">
     <style>
-    .tooltip {
-        position: absolute;
-        text-align: center;
-        width: 300px;
-        height: auto;
-        padding: 10px;
-        background: #fff;
-        border: 1px solid;
-        border-radius: 8px;
-        pointer-events: none;
-        font-size: 16px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
+        .tooltip {
+            position: absolute;
+            text-align: center;
+            width: 300px;
+            height: auto;
+            padding: 10px;
+            background: #fff;
+            border: 1px solid;
+            border-radius: 8px;
+            pointer-events: none;
+            font-size: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
 
-    .tooltip svg {
-        margin-top: 10px;
-    }
+        .tooltip svg {
+            margin-top: 10px;
+        }
 
-    .day {
-        cursor: pointer;
-        transition: transform 0.2s;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
+        .day {
+            cursor: pointer;
+            transition: transform 0.2s;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
 
-    .highlighted {
-        fill: yellow;
-    }
+        .highlighted {
+            fill: yellow;
+        }
 
-    .grid {
-        font-family: "HackNerd", sans-serif;
-        font-size: 20px;
-        margin: 50px auto;
-        display: grid;
-        grid-template-columns: repeat(7, 1fr);
-        gap: 1px;
-        width: 80%;
-        height: 100%;
-        background-color: #ccc;
-    }
+        .grid {
+            font-family: "HackNerd", sans-serif;
+            font-size: 20px;
+            margin: 50px auto;
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            width: 80%;
+            height: 100%;
+            background-color: #ccc;
+        }
 
-    .day,
-    .header {
-        padding: 10px;
-        background-color: #fff;
-        text-align: center;
-        box-sizing: border-box;
-    }
+        .day,
+        .header {
+            padding: 10px;
+            background-color: #fff;
+            text-align: center;
+            box-sizing: border-box;
+        }
 
-    .monthYearName {
-        text-align: center;
-        box-sizing: border-box;
-        font-family: "HackNerd", sans-serif;
-        font-size: 20px;
-        margin: 50px auto;
-        gap: 1px;
-        width: 100%;
-        max-width: 800px;
-        background-color: #ccc;
-    }
+        .monthYearName {
+            text-align: center;
+            box-sizing: border-box;
+            font-family: "HackNerd", sans-serif;
+            font-size: 20px;
+            margin: 50px auto;
+            gap: 1px;
+            width: 100%;
+            max-width: 800px;
+            background-color: #ccc;
+        }
 
-    .header {
-        font-weight: bold;
-        background-color: #f7f7f7;
-    }
+        .header {
+            font-weight: bold;
+            background-color: #f7f7f7;
+        }
 
-    .buttons {
-        display: flex;
-        justify-content: center;
-        margin-bottom: 20px;
-    }
+        .buttons {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
 
-    .buttons button {
-        margin: 0 10px;
-        padding: 10px 20px;
-        cursor: pointer;
-        border: none;
-        background-color: #5a67d8;
-        color: #fff;
-        border-radius: 5px;
-        transition: background-color 0.3s;
-    }
+        .buttons button {
+            margin: 0 10px;
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            background-color: #5a67d8;
+            color: #fff;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
 
-    .buttons button:hover {
-        background-color: #434190;
-    }
+        .buttons button:hover {
+            background-color: #434190;
+        }
 
-    .cards-container {
-        margin-left: 10%;
-        margin-right: 10%;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
+        .cards-container {
+            margin-left: 10%;
+            margin-right: 10%;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
 
-    }
+        .card {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.2s;
+            position: relative;
+        }
 
-    .card {
-        background: #fff;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        padding: 10px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        cursor: pointer;
-        transition: transform 0.2s;
-    }
+        .card:hover {
+            transform: scale(1.05);
+        }
 
-    .card:hover {
-        transform: scale(1.05);
-    }
+        .monthButtons {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .monthButtons button {
+            margin: 0 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+            border: none;
+            background-color: #5a67d8;
+            color: #fff;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            font-size: 14px;
+            bold: 700;
+        }
+
+        .monthButtons button:hover {
+            background-color: #434190;
+        }
+
+        .arrows {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .arrows button {
+            padding: 20px;
+            cursor: pointer;
+            border: none;
+            background-color: #5a67d8;
+            color: #fff;
+            border-radius: 50%;
+            transition: background-color 0.3s;
+            font-size: 24px;
+        }
+
+        .arrows button:hover {
+            background-color: #434190;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #ff6b6b;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            text-align: center;
+            line-height: 25px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .close-btn:hover {
+            background: #e63946;
+        }
     </style>
 </head>
 <body>
-    <div class="buttons">
-        <button id="prevMonth">Previous Month</button>
-        <button id="nextMonth">Next Month</button>
+    <div id="controls">
+        <div id="monthButtons" class="monthButtons"></div>
+        <div class="arrows">
+            <button id="prevMonth">&#8592;</button>
+            <button id="nextMonth">&#8594;</button>
+        </div>
     </div>
     <div id="calendar" class="calendar">
         <div id="monthYearName" class="monthYearName"></div>
@@ -134,6 +206,7 @@
         <div id="time-spent-pie-chart"></div>
     </div>
     <div id="cards-container" class="cards-container"></div>
+    <div id="annotation-container"></div> <!-- Add this container for annotations -->
     <script src="script.js"></script>
 </body>
 </html>
