@@ -2,6 +2,9 @@ const currentDate = new Date("2023-08-01");
 let allData = [];
 let eventsData = [];
 
+
+print = console.log;
+
 const svg = d3.select("#calendar");
 const tooltip = d3.select("#tooltip");
 const tooltipText = d3.select("#tooltip-text");
@@ -58,9 +61,9 @@ function updateCalendar(monthYear) {
 
                 if (dayData) {
                     tooltipContent += `
-                        <strong>Sleep:</strong> ${Math.round(dayData.sleep_duration)} hours<br>
+                        <strong>Sleep:</strong> ${Math.floor(dayData.sleep_duration)} hours ${Math.round(dayData.sleep_duration * 60 - Math.floor(dayData.sleep_duration) * 60)} minutes<br>
                         <strong>Steps:</strong> ${Math.round(dayData.num_steps)}<br>
-                        <strong>Weight:</strong> ${Math.round(dayData.weight)} lbs<br>
+                        <strong>Weight:</strong> ${Math.round(dayData.weight) == 0 ? "NaN" : Math.round(dayData.weight)} lbs<br>
                     `;
 
                     const heartRateData = Object.keys(dayData.heart_rate_pie_chart).map(key => {
@@ -106,14 +109,18 @@ function updateCalendar(monthYear) {
                         .data(timeSpentArcs)
                         .join("path")
                         .attr("d", arc)
-                        .attr("fill", (d, i) => d3.schemeCategory10[i]);
+                        .attr("fill", (d, i) => "#" + colorPallet[i]);
 
                     timeSpentSvgEnter.merge(timeSpentSvg).selectAll("text")
                         .data(timeSpentArcs)
                         .join("text")
                         .attr("transform", d => `translate(${arc.centroid(d)})`)
                         .attr("dy", "0.35em")
-                        .text(d => d.data.label);
+                        .text(d => {
+                            const total = d3.sum(timeSpentArcs.map(d => d.value));
+                            const percentage = (d.value / total) * 100;
+                            return percentage > 10 ? d.data.label : '';
+                        });
                 }
 
                 if (_event) {
@@ -165,26 +172,40 @@ const data_path = "./data.csv";
 d3.csv(data_path).then(data => {
     data.forEach(d => {
         d.date = parseDate(d.date);
-        d.sleep_duration = Math.round(+d.sleep_duration);
+        d.sleep_duration = (+d.sleep_duration);
         d.num_steps = Math.round(+d.num_steps);
-        d.weight = Math.round(+d.weight);
+        d.weight = Math.round(+d.weight * 10) / 10;
         d.heart_rate_pie_chart = {
             high: Math.round(+d.stress_max),
             low: Math.round(+d.stress_min),
         };
+
         d.timeSpent = {
-            homework: Math.round(+d.HOMEWORK),
-            exercising: Math.round(+d.EXERCISING),
-            school: Math.round(+d.SCHOOL),
-            productivity: Math.round(+d.PRODUCTIVITY),
-            selfImprovement: Math.round(+d['SELF IMPROVEMENT']),
-            career: Math.round(+d.CAREER),
-            chores: Math.round(+d.CHORES),
-            studentOrganizations: Math.round(+d['STUDENT ORGANIZATIONS']),
-            eating: Math.round(+d.EATING),
-            socializing: Math.round(+d.SOCIALIZING),
-            research: Math.round(+d.RESEARCH),
+            homework: (+d.HOMEWORK),
+            exercising: (+d.EXERCISING),
+            school: (+d.SCHOOL),
+            dating: (+d.GIRLFRIEND),
+            productivity: (+d.PRODUCTIVITY),
+            selfImprovement: (+d['SELF IMPROVEMENT']),
+            career: (+d.CAREER),
+            chores: (+d.CHORES),
+            studentOrganizations: (+d['STUDENT ORGANIZATIONS']),
+            personalProjects: (+d['PERSONAL PROJECTS']),
+            freeTime: (+d['FREE TIME']),
+            eating: (+d.EATING),
+            socializing: (+d.SOCIALIZING),
+            research: (+d.RESEARCH),
         };
+
+        // get the time spent sleeping, and sum up all of the amount of hours we have 
+        total_time = 0;
+        Object.keys(d.timeSpent).forEach(key => {
+            total_time += d.timeSpent[key];
+        });
+        total_time += d.sleep_duration;
+        d.timeSpent.sleep = d.sleep_duration;
+        d.timeSpent.unknown = 24 - total_time;
+    
     });
 
     allData = data;
@@ -193,6 +214,12 @@ d3.csv(data_path).then(data => {
     console.error("Error loading the CSV data:", error);
 });
 
+changeMonth(1);
+changeMonth(1);
+changeMonth(1);
+changeMonth(-1);
+changeMonth(-1);
+changeMonth(-1);
 // Load the events data
 d3.json("events.json").then(data => {
     eventsData = Object.keys(data).map(key => ({
