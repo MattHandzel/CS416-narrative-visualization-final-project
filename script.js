@@ -4,6 +4,7 @@ const state = {
     eventsData: [],
     selectedDates: [],
     isCtrlPressed: false,
+    annotationsVisible: true,
     colorPallet: ["#55D6BE", "#7D5BA6", "#DDDDDD", "#706C61", "#FFBA08", "#399C5", "#F4A261", "#2A9D8F", "#E9C46A", "#E76F51"],
 };
 
@@ -17,7 +18,8 @@ const selectors = {
     monthButtons: d3.select("#monthButtons"),
     prevMonth: d3.select("#prevMonth"),
     nextMonth: d3.select("#nextMonth"),
-    annotationContainer: d3.select("#annotation-container")
+    annotationContainer: d3.select("#annotation-container"),
+    tutorialOverlay: d3.select("#tutorial-overlay"),
 };
 
 const parseDate = d3.timeParse("%Y-%m-%d");
@@ -67,6 +69,7 @@ const parseData = (data) => {
 const updateCalendar = (monthYear) => {
     const grid = d3.select("#grid");
     grid.selectAll("*").remove();
+    // selectors.calendar.on("mouseout", () => {state.annotationsVisible = true;updateAnnotations(); console.log("mouse out")})
     const monthYearName = d3.select("#monthYearName");
 
     const monthDays = d3.timeDays(d3.timeMonth(monthYear), d3.timeMonth.offset(monthYear, 1)).slice(0, -1);
@@ -83,7 +86,7 @@ const updateCalendar = (monthYear) => {
 
     monthDays.forEach(date => createDayCell(grid, date));
 
-    addAnnotations(monthYear);
+    addAnnotations(monthYear, monthDays, monthStartDay);
 };
 
 const createDayCell = (grid, date) => {
@@ -96,8 +99,12 @@ const createDayCell = (grid, date) => {
         .text(date.getDate())
         .on("mouseover", function (event) {
             showTooltip(event, date, dayData, _event);
+            showAnnotation(date.getTime());
         })
-        .on("mouseout", () => selectors.tooltip.transition().duration(500).style("opacity", 0))
+        .on("mouseout", () => {
+            selectors.tooltip.transition().duration(500).style("opacity", 0);
+            clearAnnotations();
+        })
         .on("click", () => handleDayClick(date, dayData));
 
     dayCell.style("background-color", getDayColor(dayData, _event));
@@ -263,7 +270,7 @@ const renderCard = (cardContent, averages) => {
     });
 };
 
-const addAnnotations = (monthYear) => {
+const addAnnotations = (monthYear, monthDays, monthStartDay) => {
     const monthStart = d3.timeMonth(monthYear);
     const monthEnd = d3.timeMonth.offset(monthYear, 1);
 
@@ -273,26 +280,52 @@ const addAnnotations = (monthYear) => {
         return (eventStart >= monthStart && eventStart < monthEnd) || (eventEnd >= monthStart && eventEnd < monthEnd) || (eventStart <= monthStart && eventEnd >= monthEnd);
     });
 
-    const annotations = monthEvents.map(event => {
-        const highlights = event.highlights.join(", ");
-        return {
-            note: {
-                label: `Event: ${event.name}\nHighlights: ${highlights}\nDescription: ${event.description}`,
-                title: formatMonthYear(monthYear)
-            },
-            x: 20,
-            y: 20 + 80 * monthEvents.indexOf(event),
-            dy: 30,
-            dx: 30
-        };
+    monthEvents.forEach(event => {
+        const eventStart = parseDate(event.start_date);
+        const dayCell = d3.select(`[data-date="${eventStart.getTime()}"]`);
+        
+        if (!dayCell.empty()) {
+            const highlights = event.highlights.join(", ");
+            dayCell.append("div")
+                .attr("class", "annotation")
+                .style("position", "absolute")
+                .style("background-color", "#fff")
+                .style("border", "1px solid #000")
+                .style("padding", "5px")
+                .style("border-radius", "5px")
+                .style("box-shadow", "0 2px 4px rgba(0, 0, 0, 0.1)")
+                .style("z-index", "10")
+                .html(`
+                    <strong>${formatMonthYear(monthYear)}</strong><br>
+                    <strong>Event:</strong> ${event.name}<br>
+                    <strong>Highlights:</strong> ${highlights}<br>
+                    <strong>Description:</strong> ${event.description}
+                `);
+        }
     });
-
-    const makeAnnotations = d3.annotation().annotations(annotations);
-    selectors.annotationContainer.selectAll("*").remove();
-    selectors.annotationContainer.append("g")
-        .attr("class", "annotation-group")
-        .call(makeAnnotations);
 };
+
+const showAnnotation = (date) => {
+    if (!state.annotationsVisible) return;
+
+    const dayCell = d3.select(`[data-date="${date}"] .annotation`);
+    if (!dayCell.empty()) {
+        dayCell.style("display", "block");
+    }
+};
+
+const clearAnnotations = () => {
+    d3.selectAll(".annotation").style("display", "none");
+};
+
+const toggleAnnotations = () => {
+    state.annotationsVisible = !state.annotationsVisible;
+    updateAnnotations();
+};
+const updateAnnotations = () => {
+    d3.selectAll(".annotation").style("display", state.annotationsVisible ? "block" : "none");
+}
+
 
 const changeMonth = (offset) => {
     state.currentDate.setMonth(state.currentDate.getMonth() + offset);
@@ -306,6 +339,8 @@ const init = async () => {
 
     updateCalendar(state.currentDate);
     populateMonthButtons();
+    showTutorial();
+    toggleAnnotations();
 };
 
 const populateMonthButtons = () => {
@@ -323,11 +358,46 @@ const populateMonthButtons = () => {
     buttons.exit().remove();
 };
 
+const showTutorial = () => {
+    const tutorial = selectors.tutorialOverlay.append("div")
+        .attr("class", "tutorial")
+        .style("position", "fixed")
+        .style("top", "50%")
+        .style("left", "50%")
+        .style("transform", "translate(-50%, -50%)")
+        .style("background-color", "#fff")
+        .style("border", "1px solid #000")
+        .style("padding", "20px")
+        .style("border-radius", "10px")
+        .style("box-shadow", "0 4px 8px rgba(0, 0, 0, 0.1)")
+        .style("z-index", "1000")
+        .style("text-align", "center")
+        .html(`
+            <h2>Welcome to the Calendar Visualization Project</h2>
+            <p>This project is a narrative data visulazation of my freshman year of college!<p>
+            <p>Hold control and click to select dates to aggregate and see averages</p>
+            <p>Press 'X' to toggle annotations.</p>
+            <p>Press any key to close this tutorial.</p>
+        `);
+
+    selectors.tutorialOverlay.style("display", "block");
+
+    // tutorial.on("mouseout", () => hideTutorial());
+    document.addEventListener("keydown", hideTutorial);
+};
+
+const hideTutorial = () => {
+    selectors.tutorialOverlay.style("display", "none");
+    d3.select(".tutorial").remove();
+    document.removeEventListener("keydown", hideTutorial);
+};
+
 selectors.prevMonth.on("click", () => changeMonth(-1));
 selectors.nextMonth.on("click", () => changeMonth(1));
 document.addEventListener("keydown", (event) => {
     if (event.key === "Control") {
         state.isCtrlPressed = true;
+        toggleAnnotations();
     }
     if (event.key === "ArrowLeft" || event.key === "h") {
         changeMonth(-1);
@@ -335,13 +405,14 @@ document.addEventListener("keydown", (event) => {
     if (event.key === "ArrowRight" || event.key === "l") {
         changeMonth(1);
     }
+    if (event.key.toLowerCase() === "x") {
+        toggleAnnotations();
+    }
 });
 document.addEventListener("keyup", (event) => {
     if (event.key === "Control") {
         state.isCtrlPressed = false;
-        if (state.selectedDates.length > 0) {
-            calculateAverages();
-        }
+        toggleAnnotations();
     }
 });
 

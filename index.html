@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>Calendar Visualization</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
-    <script src="https://raw.githubusercontent.com/susielu/d3-annotation/master/d3-annotation.js"></script>
     <link rel="stylesheet" href="styles.css">
     <style>
         .tooltip {
@@ -32,6 +31,7 @@
             cursor: pointer;
             transition: transform 0.2s;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            position: relative;
         }
 
         .highlighted {
@@ -186,6 +186,29 @@
         .close-btn:hover {
             background: #e63946;
         }
+
+        .annotation {
+            position: absolute;
+            background-color: #fff;
+            border: 1px solid #000;
+            padding: 5px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+
+        .tutorial-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: block;
+            justify-content: center;
+            align-items: center;
+        }
     </style>
 </head>
 <body>
@@ -207,6 +230,7 @@
     </div>
     <div id="cards-container" class="cards-container"></div>
     <div id="annotation-container"></div> <!-- Add this container for annotations -->
+    <div id="tutorial-overlay" class="tutorial-overlay"></div>
     <script src="script.js"></script>
 </body>
 </html>
