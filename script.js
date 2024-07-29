@@ -7,7 +7,6 @@ const state = {
     annotationsVisible: true,
     colorPallet: ["#55D6BE", "#7D5BA6", "#DDDDDD", "#706C61", "#FFBA08", "#399C5", "#F4A261", "#2A9D8F", "#E9C46A", "#E76F51"],
 };
-
 const selectors = {
     calendar: d3.select("#calendar"),
     tooltip: d3.select("#tooltip"),
@@ -148,31 +147,35 @@ const generateTooltipContent = (date, dayData, event) => {
 };
 
 const generatePieChart = (svg, data) => {
-    const chartData = Object.keys(data).map(key => ({ label: key, value: Math.round(data[key]) }));
-    const arcs = pie(chartData);
+const chartData = Object.keys(data).map(key => ({ label: key, value: Math.round(data[key]) }));
+const arcs = pie(chartData);
 
-    const chartSvg = svg.selectAll("svg").data([null]);
-    const chartSvgEnter = chartSvg.enter().append("svg")
-        .attr("width", 150)
-        .attr("height", 150)
-        .append("g")
-        .attr("transform", "translate(75,75)");
+const chartSvg = svg.selectAll("svg").data([null]);
+const chartSvgEnter = chartSvg.enter().append("svg")
+    .attr("width", 150)
+    .attr("height", 150)
+    .append("g")
+    .attr("transform", "translate(75,75)");
 
-    chartSvgEnter.merge(chartSvg).selectAll("path")
-        .data(arcs)
-        .join("path")
-        .attr("d", arc)
-        .attr("fill", (d, i) => state.colorPallet[i % state.colorPallet.length]);
+chartSvgEnter.merge(chartSvg).selectAll("path")
+    .data(arcs)
+    .join("path")
+    .attr("d", arc)
+    .attr("fill", (d, i) => state.colorPallet[i % state.colorPallet.length]);
 
-    chartSvgEnter.merge(chartSvg).selectAll("text")
-        .data(arcs)
-        .join("text")
-        .attr("transform", d => `translate(${arc.centroid(d)})`)
-        .attr("dy", "0.35em")
-        .attr("font-size", "10px")
-        .attr("text-anchor", "middle")
-        .text(d => d.data.label);
-
+chartSvgEnter.merge(chartSvg).selectAll("text")
+    .data(arcs)
+    .join("text")
+    .attr("transform", d => `translate(${arc.centroid(d)})`)
+    .attr("dy", "0.35em")
+    .attr("font-size", "10px")
+    .attr("text-anchor", "middle")
+    .attr("font-size", "8px")
+    .text(d => {
+        const angle = (d.endAngle - d.startAngle) * (180 / Math.PI);
+        const thresholdAngle = 10;
+        return angle >= thresholdAngle ? d.data.label : "";
+    });
     return chartSvgEnter;
 };
 
@@ -333,8 +336,8 @@ const changeMonth = (offset) => {
 };
 
 const init = async () => {
-    state.allData = await loadData("./data.csv", parseData, d3.csv);
-    state.eventsData = await loadData("events.json", d => d, d3.json);
+    state.allData = await loadData("https://raw.githubusercontent.com/MattHandzel/HealthDataAnalysis/main/daily_df.csv", parseData, d3.csv);
+    state.eventsData = await loadData("https://raw.githubusercontent.com/MattHandzel/HealthDataAnalysis/main/events.json", d => d, d3.json);
     state.currentDate = d3.min(state.allData, d => d.date);
 
     updateCalendar(state.currentDate);
@@ -413,6 +416,7 @@ document.addEventListener("keyup", (event) => {
     if (event.key === "Control") {
         state.isCtrlPressed = false;
         toggleAnnotations();
+        calculateAverages();
     }
 });
 
