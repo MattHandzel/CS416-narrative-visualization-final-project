@@ -1,5 +1,5 @@
 # Intro
-This is a data visualization where all of the data came from me! I collected the data from my Galaxy Watch 5 smartwatch (for health-related metrics like sleep, steps walked, heart rate, etc.), and from my google calendar (to get an idea of how I spend my time). The data source is from another project I worked on and keep up to date, it just extracts data from these sources and then exports them to CSVs, (along with some graphs), I repurposed this data for this project.
+This is a data visualization where all of the data came from [me](https://github.com/MattHandzel/HealthDataAnalysis)! I collected the data from my Galaxy Watch 5 smartwatch (for health-related metrics like sleep, steps walked, heart rate, etc.), and from my google calendar (to get an idea of how I spend my time). The data source is from another project I worked on and keep up to date, it just extracts data from these sources and then exports them to CSVs, (along with some graphs), I repurposed this data for this project.
 
 
 ### Messaging
